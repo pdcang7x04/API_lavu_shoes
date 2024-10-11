@@ -3,14 +3,20 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+var cors = require('cors');
 
 const mongoose = require('mongoose');
 require('./controller/user/userModel')
 require('./controller/user/UserOTPVerification')
 require('./controller/user/AccountGoogle')
+require('./controller/brand/brandModel')
+require('./controller/category/categoryModel')
+require('./controller/product/productModel')
 
 var usersRouter = require('./routes/users');
-
+var brandsRouter = require('./routes/brands')
+var categoriesRouter = require('./routes/categories')
+var productsRouter = require('./routes/products')
 
 var app = express();
 
@@ -23,9 +29,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-
+app.use(cors());
 
 app.use('/users', usersRouter);
+app.use('/brands', brandsRouter)
+app.use('/categories', categoriesRouter)
+app.use('/products', productsRouter)
 
 
 mongoose.connect('mongodb+srv://phamdinhcang350:2eXqbBVIpbMq0jGg@duantotnghiep.sj9fy.mongodb.net/Lavu?retryWrites=true&w=majority&appName=DuAnTotNghiep')

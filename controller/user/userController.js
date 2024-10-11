@@ -101,11 +101,13 @@ const login = async (email, password) => {
             throw new Error('Password không đúng');
         } else {
             const user = new userModel({
+                _id: data._id,
                 username: data.username,
                 email: data.email,
                 phone: data.phone,
                 address: data.address,
-                image: data.image
+                image: data.image,
+                role: data.role
             })
             return user;
         }
@@ -186,15 +188,21 @@ const updateUser = async (_id, username, email, image) => {
 }
 
 // lấy danh sách khách hàng
-const getUser = async (page, limit) => {
+const getUser = async (page, limit, keywords) => {
     try {
         page = parseInt(page) || 1
-        limit = parseInt(limit) || 10
-        let query = { role: 1 }
+        limit = parseInt(limit) || 20
+        let sort = { createdAt: -1 };
+        let query = { 
+            role: 1,
+            name: { $regex: keywords, $options: 'i' }
+        }
+        
 
         let result = userModel
             .find(query)
             .limit(limit)
+            .sort(sort)
         return result
     } catch (error) {
         console.log(error.message);
