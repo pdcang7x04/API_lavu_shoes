@@ -1,3 +1,4 @@
+const { default: mongoose } = require("mongoose");
 const brandModel = require("../brand/brandModel");
 const categoryModel = require("../category/categoryModel");
 const productModel = require("./productModel");
@@ -51,7 +52,7 @@ const dataTest = async () => {
                 }
             });
             await product.save();
-            
+
         }
 
 
@@ -62,7 +63,7 @@ const dataTest = async () => {
 }
 
 //thêm mới brand
-const insert = async (name, price, currentQuantity, description, images, colors, sizes, status, brandName, category) => {
+const insert = async (name, price, currentQuantity, description, images, colors, sizes, status, brand, category) => {
     try {
         // Tạo mảng trống cho hình ảnh, màu sắc và kích thước
         const image = Array.isArray(images) ? images : [];
@@ -175,31 +176,66 @@ const getProductById = async (id) => {
     }
 };
 
+// lấy sản phẩm theo brand
+const getProductByBrand = async (id) => {
+    try {
+        // Sử dụng 'new' để tạo ObjectId
+        const brandId = new mongoose.Types.ObjectId(id);
+
+        const data = await productModel
+            .find({ "brand._id": brandId })
+
+        if (!data || data.length === 0) {
+            throw new Error('Không tìm thấy sản phẩm với thương hiệu đã cho');
+        }
+
+        return data; // Trả về danh sách sản phẩm tìm thấy
+    } catch (error) {
+        console.error('Có lỗi xảy ra khi lấy sản phẩm:', error);
+        throw error; // Ném lại lỗi để có thể xử lý ở nơi gọi hàm
+    }
+};
+
+
+
+
 const getProduct = async (page, limit, keywords) => {
     try {
+        // Chuyển đổi page và limit thành số nguyên
         page = parseInt(page) || 1;
-        limit = parseInt(limit) || 10
-        let skip = (page - 1) * limit;
+        limit = parseInt(limit) || 20; 
+        let skip = (page - 1) * limit; // Tính số lượng sản phẩm bỏ qua
+
+        // Sắp xếp theo ngày tạo
         let sort = { createdAt: -1 };
-        let query = {}
-        query = {
-            name: { $regex: keywords, $options: 'i' }
+
+        // Tạo truy vấn tìm kiếm
+        let query = {
+            name: { $regex: keywords, $options: 'i' } // Tìm kiếm theo tên sản phẩm
         };
 
-        let product = productModel
-            .find(query)
-            //bỏ qua bao nhiêu sản phẩm
-            .skip(skip)
-            //giới hạn số lượng sản phẩm
-            .limit(limit)
-            //sắp sếp theo thời gian tạo
-            .sort(sort);
-        return product;
+        // Lấy danh sách sản phẩm từ cơ sở dữ liệu
+        let products = await productModel
+            .find(query) // Tìm sản phẩm theo query
+            .skip(skip) // Bỏ qua số sản phẩm đã tính toán
+            .limit(limit) // Giới hạn số lượng sản phẩm trả về
+            .sort(sort); // Sắp xếp theo trường createdAt
+
+        // Tính tổng số sản phẩm thỏa mãn điều kiện
+        const totalProducts = await productModel.countDocuments(query);
+
+        // Trả về kết quả
+        return {
+            status: true,
+            data: products,
+            total: totalProducts,
+            currentPage: page,
+            totalPages: Math.ceil(totalProducts / limit), // Tính tổng số trang
+        };
     } catch (error) {
-        console.log(error.message);
-        throw error;
+        console.error("Lỗi khi lấy sản phẩm:", error.message);
+        throw error; // Ném lỗi để xử lý ở nơi khác
     }
-}
+};
 
-
-module.exports = { dataTest, insert, update, deleteById, getProductById, getProduct };
+module.exports = { dataTest, insert, update, deleteById, getProductById, getProduct, getProductByBrand };

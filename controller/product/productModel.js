@@ -8,7 +8,7 @@ const productSchema = new Schema({
     image: {type: Array, required: true},
     color: {type: Object, required: true},
     size: {type: Array, required: true},
-    status: {type: Number, default: 1}, // 1: new
+    status: {type: Number, default: 1}, // 1: mới nhất 2: bán chạy 3: phổ biến 4: sản phẩm có hạn, 5: hết hàng
     brand: {type: Object, required: true},
     category: {type: Object, required: true},
 

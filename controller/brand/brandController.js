@@ -73,17 +73,9 @@ const getBrandById = async (id) => {
     }
 };
 
-const getBrand = async (page, limit, keywords) => {
+const getBrand = async () => {
     try {
-        page = parseInt(page) || 1
-        limit = parseInt(limit) || 20
-        let sort = { createdAt: -1 };
-
-        const data = await brandModel
-            .find({name: { $regex: keywords, $options: 'i' }})
-            .limit(limit)
-            .sort(sort);
-
+        const data = await brandModel.find({})
         return data;
     } catch (error) {
         console.error('Có lỗi xảy ra khi lấy sản phẩm:', error);

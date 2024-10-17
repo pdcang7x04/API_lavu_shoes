@@ -9,10 +9,7 @@ var router = express.Router();
  */
 router.get('/getBrand', async (req, res, next) => {
     try {
-        const page = req.query.page
-        const limit = req.query.limit
-        const keywords = req.query.keywords
-        const data = await getBrand(page, limit, keywords)
+        const data = await getBrand()
         if (data) {
             return res.status(200).json({ status: true, data: data });
         } else {

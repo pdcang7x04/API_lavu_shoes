@@ -12,11 +12,13 @@ require('./controller/user/AccountGoogle')
 require('./controller/brand/brandModel')
 require('./controller/category/categoryModel')
 require('./controller/product/productModel')
+require('./controller/order/orderModel')
 
 var usersRouter = require('./routes/users');
 var brandsRouter = require('./routes/brands')
 var categoriesRouter = require('./routes/categories')
 var productsRouter = require('./routes/products')
+var ordersRouter = require('./routes/orders')
 
 var app = express();
 
@@ -35,6 +37,7 @@ app.use('/users', usersRouter);
 app.use('/brands', brandsRouter)
 app.use('/categories', categoriesRouter)
 app.use('/products', productsRouter)
+app.use('/orders', ordersRouter)
 
 
 mongoose.connect('mongodb+srv://phamdinhcang350:2eXqbBVIpbMq0jGg@duantotnghiep.sj9fy.mongodb.net/Lavu?retryWrites=true&w=majority&appName=DuAnTotNghiep')

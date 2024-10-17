@@ -1,5 +1,5 @@
 var express = require('express');
-const { getProduct, insert, update, deleteById, getProductById, dataTest } = require('../controller/product/productController');
+const { getProduct, insert, update, deleteById, getProductById, dataTest, getProductByBrand } = require('../controller/product/productController');
 var router = express.Router();
 
 /**
@@ -44,14 +44,35 @@ router.get('/getProduct', async (req, res, next) => {
 });
 
 /**
+ * lấy danh sách sản phâmt theo thương hiệu
+ * method: get
+ * url: http://localhost:3000/products/getProductByBrand
+ */
+router.get('/getProductByBrand/:id', async (req, res, next) => {
+    try {
+        const id = req.params.id
+        const data = await getProductByBrand(id)
+        if (data) {
+            return res.status(200).json({ status: true, data: data });
+        } else {
+            return res.status(400).json({ status: false });
+        }
+    } catch (error) {
+        console.log(error.message);
+        return res.status(500).json({ status: false, error: error.message });
+    }
+});
+
+
+/**
  * thêm sản phẩm
  * method: post
  * url: http://localhost:3000/products/insert
  */
 router.post('/insert', async (req, res, next) => {
     try {
-        const {name, price, currentQuantity, description, images, colors, sizes, status, brandName, category} = req.body
-        const data = await insert(name, price, currentQuantity, description, images, colors, sizes, status, brandName, category)
+        const {name, price, currentQuantity, description, images, colors, sizes, status, brand, category} = req.body
+        const data = await insert(name, price, currentQuantity, description, images, colors, sizes, status, brand, category)
         if (data) {
             return res.status(200).json({ status: true, data: data });
         } else {

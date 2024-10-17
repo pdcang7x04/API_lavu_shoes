@@ -267,7 +267,8 @@ const sendOTPVerificationEmail = async (email) => {
             expriresAt: Date.now() + 600000,
         });
 
-        return await newuserOTPVerification.save()
+        result = await newuserOTPVerification.save()
+        return result
     } catch (error) {
         console.log(error.message);
         throw error;
@@ -291,8 +292,8 @@ const verifyOTP = async (_id, otp) => {
                 throw new Error('Code has expired. Please request again.');
             } else {
                 await userModel.updateOne({ _id: _id }, { permission: true })
-                await userOTPVerification.deleteMany({ _id })
-                return "User email verify successfully."
+                const result = await userOTPVerification.deleteMany({ _id })
+                return result
             }
         }
     } catch (error) {
@@ -317,7 +318,8 @@ const updatePassword = async (email, password) => {
         data.password = password
         data.updatedAt = Date.now();
 
-        return await data.save()
+        const result = await data.save()
+        return result
     } catch (error) {
         console.log(error.message);
         throw error;
@@ -343,7 +345,8 @@ const changePassword = async (email, oldPassword, newPassword) => {
             data.password = newPassword
             data.updatedAt = Date.now();
 
-            return await data.save()
+            const result = await data.save()
+            return result
         }
     } catch (error) {
         console.log(error.message);
@@ -362,7 +365,8 @@ const updateShippingAddress = async (_id, address, phone) => {
         user.address = address || user.address
         user.phone = phone || user.phone
 
-        return await user.save();
+        const result = await user.save();
+        return result
     } catch (error) {
         console.log(error.message);
         throw error;
