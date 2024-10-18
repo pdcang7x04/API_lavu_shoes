@@ -5,7 +5,7 @@ var router = express.Router();
 /**
  * Tạo đơn hàng 
  * method: post
- * url: http://localhost:3000/orders/createOder/6700def1f0ba60d5690cd61e
+ * url: http://localhost:3000/orders/createOder
 {
     paymentmethod: MoMo,
     totalAmount: 4000000,
@@ -16,11 +16,10 @@ var router = express.Router();
 }
  */
 
-router.post('/createOder/:user', async (req, res, next) => {
+router.post('/createOder', async (req, res, next) => {
     try {
-        const user = req.params.user
-        const {paymentmethod, totalAmount, paymentStatus, product, quantity, size} = req.body
-        const data = await create(user, paymentmethod, totalAmount, paymentStatus, product, quantity, size)
+        const {user, paymentmethod, totalAmount, paymentStatus, product} = req.body
+        const data = await create(user, paymentmethod, totalAmount, paymentStatus, product)
         if (data) {
             return res.status(200).json({ status: true, data: data });
         } else {

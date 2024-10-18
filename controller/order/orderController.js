@@ -1,18 +1,16 @@
 const productModel = require("../product/productModel");
 const orderModel = require("./orderModel");
 const userModel = require("../user/userModel")
+const AccountGoogle = require("../user/AccountGoogle")
 
 // tạo đơn hàng
-const create = async (user, paymentmethod, totalAmount, paymentStatus, product, quantity, size) => {
+const create = async (user, paymentmethod, totalAmount, paymentStatus, product) => {
     try {
-        let userdata = await userModel.findById(user)
+        let userdata = await userModel.findOne({email: user}) || AccountGoogle.findOne({email: user})
         if (!userdata) {
             throw new Error('Người dùng không tồn tại');
         }
-        let productdata = await productModel.findById(product)
-        if (!productdata) {
-            throw new Error('Sản phẩm không tồn tại');
-        }
+        
 
         const newOder = new orderModel({
             user: userdata._id,
@@ -23,15 +21,7 @@ const create = async (user, paymentmethod, totalAmount, paymentStatus, product, 
                 phone: userdata.phone
             },
             paymentStatus: paymentStatus,
-            orderDetail: [
-                {
-                    product: productdata._id,
-                    quantity: quantity,
-                    size: size,
-                    unitPrice: productdata.price,
-                    totalPrice: productdata.price * quantity,
-                }
-            ]
+            orderDetail: product
         })
 
         const result = await newOder.save()
