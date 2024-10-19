@@ -1,5 +1,5 @@
 var express = require('express');
-const { register, login, registerAdmin, updateUser, getUser, updatePassword, changePassword, updateShippingAddress, sendOTPVerificationEmail, verifyOTP, getUserByID, signInWithGoogle } = require('../controller/user/userController');
+const { register, login, registerAdmin, updateUser, updatePassword, changePassword, updateShippingAddress, sendOTPVerificationEmail, verifyOTP, getUserByID, signInWithGoogle, getUser } = require('../controller/user/userController');
 const userModel = require('../controller/user/userModel');
 var router = express.Router();
 
@@ -91,8 +91,9 @@ router.get('/getUser', async (req, res, next) => {
   try {
     let page = req.query.page
     let limit = req.query.limit
+    let keywords = req.query.keywords
 
-    const data = await getUser(page, limit)
+    const data = await getUser(page, limit, keywords)
 
     if (data.length > 0) {
       return res.status(200).json({ status: true, data: data });

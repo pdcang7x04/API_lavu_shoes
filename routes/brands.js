@@ -1,5 +1,5 @@
 var express = require('express');
-const { getBrand, insert, update, deleteById, getBrandById } = require('../controller/brand/brandController');
+const { getBrand, insert, update, deleteById, getBrandById, getBrandByQuery } = require('../controller/brand/brandController');
 var router = express.Router();
 
 /**
@@ -20,6 +20,29 @@ router.get('/getBrand', async (req, res, next) => {
         return res.status(500).json({ status: false, error: error.message });
     }
 });
+
+/**
+ * lấy danh sách thương hiệu có điều kiện
+ * method: get
+ * url: http://localhost:3000/brands/getBrandByQuery
+ */
+router.get('/getBrandByQuery', async (req, res, next) => {
+    try {
+        const page = req.query.page
+        const limit = req.query.limit
+        const keywords = req.query.keywords
+        const data = await getBrandByQuery(page, limit, keywords)
+        if (data) {
+            return res.status(200).json({ status: true, data: data });
+        } else {
+            return res.status(400).json({ status: false });
+        }
+    } catch (error) {
+        console.log(error.message);
+        return res.status(500).json({ status: false, error: error.message });
+    }
+});
+
 
 /**
  * thêm thương hiệu

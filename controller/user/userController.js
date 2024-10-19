@@ -190,25 +190,42 @@ const updateUser = async (_id, username, email, image) => {
 // lấy danh sách khách hàng
 const getUser = async (page, limit, keywords) => {
     try {
-        page = parseInt(page) || 1
-        limit = parseInt(limit) || 20
-        let sort = { createdAt: -1 };
-        let query = { 
-            role: 1,
-            name: { $regex: keywords, $options: 'i' }
-        }
-        
+        // Chuyển đổi page và limit thành số nguyên
+        page = parseInt(page) || 1;
+        limit = parseInt(limit) || 20; 
+        let skip = (page - 1) * limit; // Tính số lượng sản phẩm bỏ qua
 
-        let result = userModel
-            .find(query)
-            .limit(limit)
-            .sort(sort)
-        return result
+        // Sắp xếp theo ngày tạo
+        let sort = { createdAt: -1 };
+
+        // Tạo truy vấn tìm kiếm
+        let query = {
+            name: { $regex: keywords, $options: 'i' } // Tìm kiếm theo tên sản phẩm
+        };
+
+        // Lấy danh sách sản phẩm từ cơ sở dữ liệu
+        let brand = await userModel
+            .find(query) // Tìm sản phẩm theo query
+            .skip(skip) // Bỏ qua số sản phẩm đã tính toán
+            .limit(limit) // Giới hạn số lượng sản phẩm trả về
+            .sort(sort); // Sắp xếp theo trường createdAt
+
+        // Tính tổng số sản phẩm thỏa mãn điều kiện
+        const totalBrand = await userModel.countDocuments(query);
+
+        // Trả về kết quả
+        return {
+            status: true,
+            data: brand,
+            total: totalBrand,
+            currentPage: page,
+            totalPages: Math.ceil(totalBrand / limit), // Tính tổng số trang
+        };
     } catch (error) {
-        console.log(error.message);
-        throw error;
+        console.error("Lỗi khi lấy sản phẩm:", error.message);
+        throw error; // Ném lỗi để xử lý ở nơi khác
     }
-}
+};
 
 // lấy thông tin khách hàng theo id
 const getUserByID = async (_id) => {
