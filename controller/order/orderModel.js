@@ -1,7 +1,7 @@
 const { Schema, mongoose } = require("mongoose");
 
 const orderSchema = new Schema({
-    user: {type: String, required: true},
+    user: {type: Object, required: true},
     paymentmethod: {type: String, required: true},
     totalAmount: {type: Number, require: true},
     shippingAddress: {type: Object, required: true},

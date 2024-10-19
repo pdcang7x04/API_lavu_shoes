@@ -6,14 +6,17 @@ const AccountGoogle = require("../user/AccountGoogle")
 // tạo đơn hàng
 const create = async (user, paymentmethod, totalAmount, paymentStatus, product) => {
     try {
-        let userdata = await userModel.findOne({email: user}) || AccountGoogle.findOne({email: user})
+        let userdata = await userModel.findOne({ email: user }) || AccountGoogle.findOne({ email: user })
         if (!userdata) {
             throw new Error('Người dùng không tồn tại');
         }
-        
+
 
         const newOder = new orderModel({
-            user: userdata._id,
+            user: {
+                _id: userdata._id,
+                email: userdata.email,
+            },
             paymentmethod: paymentmethod,
             totalAmount: totalAmount,
             shippingAddress: {
@@ -32,6 +35,23 @@ const create = async (user, paymentmethod, totalAmount, paymentStatus, product) 
     }
 }
 
+// lịch sử mua hàng
+const getHistoryShopping = async (email) => {
+    try {
+        let userdata = await userModel.findOne({ email: email }) || AccountGoogle.findOne({ email: email })
+        if (!userdata) {
+            throw new Error('Người dùng không tồn tại');
+        }
+        let sort = { createdAt: -1 };
+        const data = await orderModel
+            .find({ 'user.email': userdata.email })
+            .sort(sort)
+        return data
+    } catch (error) {
+        console.log(error)
+    }
+}
+
 // cập nhật trạng thái đơn hàng
 const updateStatusOrder = async (_id, paymentStatus) => {
     try {
@@ -39,7 +59,7 @@ const updateStatusOrder = async (_id, paymentStatus) => {
         if (!data) {
             throw new Error('Đơn hàng không tồn tại');
         }
-        if (data.paymentStatus = 4){
+        if (data.paymentStatus = 4) {
             throw new Error('Đơn hàng đã bị hủy');
         }
 
@@ -75,4 +95,4 @@ const getOrder = async (page, limit) => {
     }
 }
 
-module.exports = { create, updateStatusOrder, getOrder };
+module.exports = { create, updateStatusOrder, getOrder, getHistoryShopping };

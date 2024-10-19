@@ -13,12 +13,14 @@ require('./controller/brand/brandModel')
 require('./controller/category/categoryModel')
 require('./controller/product/productModel')
 require('./controller/order/orderModel')
+require('./controller/favorite/favoriteModel')
 
 var usersRouter = require('./routes/users');
 var brandsRouter = require('./routes/brands')
 var categoriesRouter = require('./routes/categories')
 var productsRouter = require('./routes/products')
 var ordersRouter = require('./routes/orders')
+var favoriteRouter = require('./routes/favorites')
 
 var app = express();
 
@@ -38,6 +40,7 @@ app.use('/brands', brandsRouter)
 app.use('/categories', categoriesRouter)
 app.use('/products', productsRouter)
 app.use('/orders', ordersRouter)
+app.use('/favorites', favoriteRouter)
 
 
 mongoose.connect('mongodb+srv://phamdinhcang350:2eXqbBVIpbMq0jGg@duantotnghiep.sj9fy.mongodb.net/Lavu?retryWrites=true&w=majority&appName=DuAnTotNghiep')
