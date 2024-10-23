@@ -190,7 +190,6 @@ const updateUser = async (_id, username, email, image) => {
 // lấy danh sách khách hàng
 const getUser = async (page, limit, keywords) => {
     try {
-        // Chuyển đổi page và limit thành số nguyên
         page = parseInt(page) || 1;
         limit = parseInt(limit) || 20; 
         let skip = (page - 1) * limit; // Tính số lượng sản phẩm bỏ qua
@@ -200,23 +199,17 @@ const getUser = async (page, limit, keywords) => {
 
         // Tạo truy vấn tìm kiếm
         let query = {
-            name: { $regex: keywords, $options: 'i' } // Tìm kiếm theo tên sản phẩm
+            username: { $regex: keywords, $options: 'i' } // Tìm kiếm theo tên sản phẩm
         };
+        const data = await userModel
+            .find(query)
+            .limit(limit)
+            .skip(skip)
+            .sort(sort)
 
-        // Lấy danh sách sản phẩm từ cơ sở dữ liệu
-        let brand = await userModel
-            .find(query) // Tìm sản phẩm theo query
-            .skip(skip) // Bỏ qua số sản phẩm đã tính toán
-            .limit(limit) // Giới hạn số lượng sản phẩm trả về
-            .sort(sort); // Sắp xếp theo trường createdAt
-
-        // Tính tổng số sản phẩm thỏa mãn điều kiện
         const totalBrand = await userModel.countDocuments(query);
-
-        // Trả về kết quả
         return {
-            status: true,
-            data: brand,
+            data: data,
             total: totalBrand,
             currentPage: page,
             totalPages: Math.ceil(totalBrand / limit), // Tính tổng số trang
@@ -230,7 +223,7 @@ const getUser = async (page, limit, keywords) => {
 // lấy thông tin khách hàng theo id
 const getUserByID = async (_id) => {
     try {
-        const user = await userModel.findById(_id)
+        const user = await userModel.findById({_id: _id})
         if (!user) {
             throw new Error('Người dùng không tồn tại');
         }
@@ -308,7 +301,7 @@ const verifyOTP = async (_id, otp) => {
                 await idOTP.deleteMany({ _id })
                 throw new Error('Code has expired. Please request again.');
             } else {
-                await userModel.updateOne({ _id: _id }, { permission: true })
+                // await userModel.updateOne({ _id: _id }, { permission: true })
                 const result = await userOTPVerification.deleteMany({ _id })
                 return result
             }

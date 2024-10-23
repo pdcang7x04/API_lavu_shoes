@@ -11,12 +11,11 @@ const create = async (user, paymentmethod, totalAmount, paymentStatus, product) 
             throw new Error('Người dùng không tồn tại');
         }
 
+        
+        
 
         const newOder = new orderModel({
-            user: {
-                _id: userdata._id,
-                email: userdata.email,
-            },
+            user: userdata,
             paymentmethod: paymentmethod,
             totalAmount: totalAmount,
             shippingAddress: {
@@ -26,6 +25,17 @@ const create = async (user, paymentmethod, totalAmount, paymentStatus, product) 
             paymentStatus: paymentStatus,
             orderDetail: product
         })
+
+        for (const item of product) {
+            const productInStock = await productModel.findById(item.product_id);
+            if (productInStock) {
+                productInStock.currentQuantity -= item.quantity; 
+                if (productInStock.stock < 0) {
+                    throw new Error('Không đủ hàng trong kho cho sản phẩm: ' + productInStock.name);
+                }
+                await productInStock.save();
+            }
+        }
 
         const result = await newOder.save()
         return result
@@ -76,22 +86,36 @@ const updateStatusOrder = async (_id, paymentStatus) => {
 }
 
 //lấy danh sách đơn hàng
-const getOrder = async (page, limit) => {
+const getOrder = async (page, limit, keywords) => {
     try {
         page = parseInt(page) || 1;
-        limit = parseInt(limit) || 20
+        limit = parseInt(limit) || 20; 
+        let skip = (page - 1) * limit; // Tính số lượng sản phẩm bỏ qua
+
+        // Sắp xếp theo ngày tạo
         let sort = { createdAt: -1 };
 
-        let order = orderModel
-            .find()
-            //giới hạn số lượng sản phẩm
+        // Tạo truy vấn tìm kiếm
+        let query = {
+            'user.username': { $regex: keywords, $options: 'i' } // Tìm kiếm theo tên sản phẩm
+        };
+        const data = await orderModel
+            .find({})
             .limit(limit)
-            //sắp sếp theo thời gian tạo
-            .sort(sort);
-        return order;
+            .skip(skip)
+            .sort(sort)
+
+        const totalBrand = await orderModel.countDocuments(query);
+
+        return {
+            data: data,
+            total: totalBrand,
+            currentPage: page,
+            totalPages: Math.ceil(totalBrand / limit), // Tính tổng số trang
+        };
     } catch (error) {
-        console.log(error.message);
-        throw error;
+        console.error("Lỗi khi lấy sản phẩm:", error.message);
+        throw error; // Ném lỗi để xử lý ở nơi khác
     }
 }
 

@@ -14,7 +14,10 @@ const orderSchema = new Schema({
  * trạng thái thanh toán
  * 1: chưa thanh toán
  * 2: đã thanh toán
- * 3: Đang giao
- * 4: đã hủy
+ * 3: đã xác nhận
+ * 4: Đang xử lý
+ * 5: Đang giao
+ * 6: Đã giao
+ * 7: đã hủy
  */
 module.exports = mongoose.models.order || mongoose.model('order', orderSchema);

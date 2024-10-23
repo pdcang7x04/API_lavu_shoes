@@ -1,5 +1,5 @@
 var express = require('express');
-const { create, getHistoryShopping } = require('../controller/order/orderController');
+const { create, getHistoryShopping, getOrder } = require('../controller/order/orderController');
 var router = express.Router();
 
 /**
@@ -59,5 +59,32 @@ router.get('/getHistoryShopping/:email', async (req, res, next) => {
         return res.status(500).json({ status: false, error: error.message });
     }
 });
+
+/**
+ * lấy dánh sách đơn hàng
+ * method: get
+ * url: http://localhost:3000/orders/getOrder
+
+ */
+
+router.get('/getOrder', async (req, res, next) => {
+    try {
+      let page = req.query.page
+      let limit = req.query.limit
+      let keywords = req.query.keywords
+  
+      const data = await getOrder(page, limit, keywords)
+  
+      if (data) {
+        return res.status(200).json({ status: true, data: data });
+      } else {
+        return res.status(400).json({ status: false });
+      }
+    } catch (error) {
+      console.error('Lỗi khi lấy người dùng:', error.message);
+      return res.status(500).json({ status: false, error: error.message });
+    }
+  });
+  
 
 module.exports = router;

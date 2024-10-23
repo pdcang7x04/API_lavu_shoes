@@ -95,10 +95,10 @@ router.get('/getUser', async (req, res, next) => {
 
     const data = await getUser(page, limit, keywords)
 
-    if (data.length > 0) {
+    if (data) {
       return res.status(200).json({ status: true, data: data });
     } else {
-      return res.status(400).json({ status: false, error: 'No data found' });
+      return res.status(400).json({ status: false });
     }
   } catch (error) {
     console.error('Lỗi khi lấy người dùng:', error.message);
@@ -111,13 +111,13 @@ router.get('/getUser', async (req, res, next) => {
  * method: GET
  * url: http://localhost:3000/users/getUserByID
  */
-router.get('/getUserByID', async (req, res, next) => {
+router.get('/getUserByID/:_id', async (req, res, next) => {
   try {
-    let _id = req.query._id
+    let _id = req.params._id
 
     const data = await getUserByID(_id)
 
-    if (data.length > 0) {
+    if (data) {
       return res.status(200).json({ status: true, data: data });
     } else {
       return res.status(400).json({ status: false, error: 'No data found' });
@@ -213,7 +213,7 @@ router.post('/sendOTPVerificationEmail', async (req, res, next) => {
   "otp": 
  }
  */
- router.post('/verifyOTP', async (req, res, next) => {
+router.post('/verifyOTP', async (req, res, next) => {
   try {
     const { _id, otp } = req.body
     const data = await verifyOTP(_id, otp)

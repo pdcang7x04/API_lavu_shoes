@@ -43,6 +43,24 @@ router.get('/getProduct', async (req, res, next) => {
     }
 });
 
+// lấy sản phẩm theo id
+router.get('/getProduct/:id', async (req, res, next) => {
+    try {
+        const id = req.params.id
+        
+        const data = await getProductById(id)
+        if (data) {
+            return res.status(200).json({ status: true, data: data });
+        } else {
+            return res.status(400).json({ status: false });
+        }
+    } catch (error) {
+        console.log(error.message);
+        return res.status(500).json({ status: false, error: error.message });
+    }
+});
+
+
 /**
  * lấy danh sách sản phâmt theo thương hiệu
  * method: get
