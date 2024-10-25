@@ -21,6 +21,7 @@ router.get('/getBrand', async (req, res, next) => {
     }
 });
 
+
 /**
  * lấy danh sách thương hiệu có điều kiện
  * method: get
@@ -104,7 +105,7 @@ router.delete('/deleteById/:id', async (req, res, next) => {
         const id = req.params.id
         const data = await deleteById(id)
         if (data) {
-            return res.status(200).json({ status: true, data: data });
+            return res.status(200).json({ status: true, data: true });
         } else {
             return res.status(400).json({ status: false });
         }

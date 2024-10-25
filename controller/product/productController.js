@@ -65,27 +65,23 @@ const dataTest = async () => {
 //thêm mới brand
 const insert = async (name, price, currentQuantity, description, images, colors, sizes, status, brand, category) => {
     try {
-        // Tạo mảng trống cho hình ảnh, màu sắc và kích thước
-        const image = Array.isArray(images) ? images : [];
-        const color = Array.isArray(colors) ? colors : [];
-        const size = Array.isArray(sizes) ? sizes : [];
 
         // Tìm thương hiệu dựa trên tên thương hiệu
-        const branddata = await brandModel.findById({ brand });
+        const branddata = await brandModel.findById( brand );
 
         // Nếu không tìm thấy thương hiệu, có thể ném lỗi hoặc xử lý tùy theo yêu cầu
         if (!branddata) {
             throw new Error('Thương hiệu không tồn tại');
         }
-
+        console.log('brand: ', branddata)
         // Tìm thương hiệu dựa trên tên thương hiệu
-        const categorydata = await brandModel.findById({ category });
+        const categorydata = await categoryModel.findById( category );
 
         // Nếu không tìm thấy thương hiệu, có thể ném lỗi hoặc xử lý tùy theo yêu cầu
         if (!categorydata) {
             throw new Error('Loại sản phẩm không tồn tại');
         }
-
+        console.log('cate: ', categorydata)
 
         // Tạo một sản phẩm mới
         const newdata = new productModel({
@@ -93,17 +89,17 @@ const insert = async (name, price, currentQuantity, description, images, colors,
             price: price,
             currentQuantity: currentQuantity,
             description: description,
-            image: image,
-            color: color,
-            size: size,
+            image: images,
+            color: colors,
+            size: sizes,
             status: status,
             brand: {
-                _id: brand._id,
-                name: brand.name
+                _id: branddata._id,
+                name: branddata.name
             },
             category: {
-                _id: category._id,
-                name: category.name
+                _id: categorydata._id,
+                name: categorydata.name
             }
         });
 
@@ -122,11 +118,12 @@ const update = async (_id, name, price, currentQuantity, description, image, col
         const data = await productModel.findById(_id);
 
         if (!data) {
-            throw new Error('Không tìm thấy sản phẩm với ID đã cho')
+            throw new Error('Không tìm thấy sản phẩm với ID đã cho');
         }
 
         data.name = name || data.name
         data.price = price || data.price
+        data.currentQuantity = currentQuantity || data.currentQuantity
         data.description = description || data.description
         data.image = image || data.image
         data.color = color || data.color
@@ -154,7 +151,7 @@ const deleteById = async (id) => {
             return null;
         }
 
-        console.log('Thương hiệu đã được xóa:', data);
+        console.log('Sản phẩm đã được xóa:', data);
         return data;
     } catch (error) {
         console.error('Có lỗi xảy ra khi xóa thương hiệu:', error);

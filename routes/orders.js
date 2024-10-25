@@ -1,5 +1,5 @@
 var express = require('express');
-const { create, getHistoryShopping, getOrder } = require('../controller/order/orderController');
+const { create, getHistoryShopping, getOrder, updateStatusOrder } = require('../controller/order/orderController');
 var router = express.Router();
 
 /**
@@ -18,7 +18,7 @@ var router = express.Router();
 
 router.post('/createOder', async (req, res, next) => {
     try {
-        const {user, paymentmethod, totalAmount, paymentStatus, product} = req.body
+        const { user, paymentmethod, totalAmount, paymentStatus, product } = req.body
         const data = await create(user, paymentmethod, totalAmount, paymentStatus, product)
         if (data) {
             return res.status(200).json({ status: true, data: data });
@@ -69,22 +69,46 @@ router.get('/getHistoryShopping/:email', async (req, res, next) => {
 
 router.get('/getOrder', async (req, res, next) => {
     try {
-      let page = req.query.page
-      let limit = req.query.limit
-      let keywords = req.query.keywords
-  
-      const data = await getOrder(page, limit, keywords)
-  
-      if (data) {
-        return res.status(200).json({ status: true, data: data });
-      } else {
-        return res.status(400).json({ status: false });
-      }
+        let page = req.query.page
+        let limit = req.query.limit
+        let keywords = req.query.keywords
+
+        const data = await getOrder(page, limit, keywords)
+
+        if (data) {
+            return res.status(200).json({ status: true, data: data });
+        } else {
+            return res.status(400).json({ status: false });
+        }
     } catch (error) {
-      console.error('Lỗi khi lấy người dùng:', error.message);
-      return res.status(500).json({ status: false, error: error.message });
+        console.error('Lỗi khi lấy người dùng:', error.message);
+        return res.status(500).json({ status: false, error: error.message });
     }
-  });
-  
+});
+
+/**
+ * cập nhật trạng thái
+ * method: get
+ * url: http://localhost:3000/orders/updateStatusOrder
+
+ */
+router.put('/updateStatusOrder/:_id', async (req, res, next) => {
+    try {
+        const _id = req.params._id
+        const paymentStatus = req.body.paymentStatus
+        const data = await updateStatusOrder(_id, paymentStatus)
+
+        if (data) {
+            return res.status(200).json({ status: true, data: data });
+        } else {
+            return res.status(400).json({ status: false });
+        }
+    } catch (error) {
+        console.error('Lỗi khi lấy người dùng:', error.message);
+        return res.status(500).json({ status: false, error: error.message });
+    }
+});
+
+
 
 module.exports = router;

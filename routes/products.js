@@ -109,7 +109,7 @@ router.post('/insert', async (req, res, next) => {
  */
 router.put('/update/:_id', async (req, res, next) => {
     try {
-        const _id = req.params.id
+        const _id = req.params._id
         const {name, price, currentQuantity, description, image, color, size, status, brand, category} = req.body
         const data = await update(_id, name, price, currentQuantity, description, image, color, size, status, brand, category)
         if (data) {

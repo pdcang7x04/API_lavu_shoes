@@ -1,5 +1,5 @@
 var express = require('express');
-const { insert, update, deleteById, getCategoryById, getAll } = require('../controller/category/categoryController');
+const { insert, update, deleteById, getCategoryById, getAll, getCategory } = require('../controller/category/categoryController');
 var router = express.Router();
 
 
@@ -24,6 +24,26 @@ router.get('/getCategory', async (req, res, next) => {
         return res.status(500).json({ status: false, error: error.message });
     }
 });
+
+/**
+ * lấy danh sách thương hiệu
+ * method: get
+ * url: http://localhost:3000/categories/getAllCategory
+ */
+router.get('/getAllCategory', async (req, res, next) => {
+    try {
+        const data = await getCategory()
+        if (data) {
+            return res.status(200).json({ status: true, data: data });
+        } else {
+            return res.status(400).json({ status: false });
+        }
+    } catch (error) {
+        console.log(error.message);
+        return res.status(500).json({ status: false, error: error.message });
+    }
+});
+
 
 /**
  * thêm loại sản phẩm

@@ -76,12 +76,36 @@ const getAll = async (page, limit, keywords) => {
         page = parseInt(page) || 1
         limit = parseInt(limit) || 20
         let sort = { createdAt: -1 };
+        let skip = (page - 1) * limit;
 
+        let query = {
+            name: { $regex: keywords, $options: 'i' } // Tìm kiếm theo tên sản phẩm
+        };
         const data = await categoryModel
-            .find({name: { $regex: keywords, $options: 'i' }})
+            .find(query )
             .limit(limit)
-            .sort(sort);
+            .sort(sort)
+            .skip(skip)
 
+        const totalBrand = await categoryModel.countDocuments(query);
+
+        // Trả về kết quả
+        return {
+            status: true,
+            data: data,
+            total: totalBrand,
+            currentPage: page,
+            totalPages: Math.ceil(totalBrand / limit), // Tính tổng số trang
+        };
+        return data;
+    } catch (error) {
+        console.error('Có lỗi xảy ra khi lấy sản phẩm:', error);
+    }
+};
+
+const getCategory = async () => {
+    try {
+        const data = await categoryModel.find({})
         return data;
     } catch (error) {
         console.error('Có lỗi xảy ra khi lấy sản phẩm:', error);
@@ -89,4 +113,4 @@ const getAll = async (page, limit, keywords) => {
 };
 
 
-module.exports = { insert, update, deleteById, getCategoryById, getAll };
+module.exports = { insert, update, deleteById, getCategoryById, getAll, getCategory };

@@ -65,25 +65,29 @@ const getHistoryShopping = async (email) => {
 // cập nhật trạng thái đơn hàng
 const updateStatusOrder = async (_id, paymentStatus) => {
     try {
-        let data = await orderModel.findById(_id)
-        if (!data) {
+        // Tìm kiếm đơn hàng theo ID
+        const order = await orderModel.findById(_id);
+        if (!order) {
             throw new Error('Đơn hàng không tồn tại');
         }
-        if (data.paymentStatus = 4) {
+        // Kiểm tra trạng thái thanh toán
+        if (order.paymentStatus === 6) {
             throw new Error('Đơn hàng đã bị hủy');
         }
 
-        data.paymentStatus = paymentStatus
-        data.updatedAt = Date.now()
+        // Cập nhật trạng thái thanh toán và thời gian cập nhật
+        order.paymentStatus = paymentStatus;
+        order.updatedAt = Date.now();
 
-        const result = await data.save()
-        return result
+        // Lưu lại thay đổi
+        const updatedOrder = await order.save();
+        return updatedOrder;
 
     } catch (error) {
-        console.log(error.message);
-        throw error;
+        console.error("Error updating order status:", error.message);
+        throw error; // Ném lại lỗi để xử lý ở nơi khác nếu cần
     }
-}
+};
 
 //lấy danh sách đơn hàng
 const getOrder = async (page, limit, keywords) => {
