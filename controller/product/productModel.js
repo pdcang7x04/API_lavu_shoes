@@ -4,6 +4,7 @@ const productSchema = new Schema({
     name: {type: String, required: true},
     price: {type: Number, required: true},
     currentQuantity:{type: Number, required: true},
+    quantitySold: {type: Number, default: 0},
     description: {type: String, default: ' '},
     image: {type: Array, required: true},
     color: {type: Object, required: true},

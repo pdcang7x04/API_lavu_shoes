@@ -1,5 +1,6 @@
 var express = require('express');
 const { getProduct, insert, update, deleteById, getProductById, dataTest, getProductByBrand } = require('../controller/product/productController');
+const productModel = require('../controller/product/productModel');
 var router = express.Router();
 
 /**
@@ -70,6 +71,26 @@ router.get('/getProductByBrand/:id', async (req, res, next) => {
     try {
         const id = req.params.id
         const data = await getProductByBrand(id)
+        if (data) {
+            return res.status(200).json({ status: true, data: data });
+        } else {
+            return res.status(400).json({ status: false });
+        }
+    } catch (error) {
+        console.log(error.message);
+        return res.status(500).json({ status: false, error: error.message });
+    }
+});
+
+
+/**
+ * lấy danh sách tất cả
+ * method: get
+ * url: http://localhost:3000/products/getall
+ */
+router.get('/getall', async (req, res, next) => {
+    try {
+        const data = await productModel.find({})
         if (data) {
             return res.status(200).json({ status: true, data: data });
         } else {

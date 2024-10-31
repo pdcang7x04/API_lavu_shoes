@@ -1,5 +1,6 @@
 var express = require('express');
-const { create, getHistoryShopping, getOrder, updateStatusOrder } = require('../controller/order/orderController');
+const { create, getHistoryShopping, getOrder, updateStatusOrder, getSalesAnhPurchase, getOrderSummary } = require('../controller/order/orderController');
+const orderModel = require('../controller/order/orderModel');
 var router = express.Router();
 
 /**
@@ -87,6 +88,30 @@ router.get('/getOrder', async (req, res, next) => {
 });
 
 /**
+ * lấy dánh sách tất cả đơn hàng
+ * method: get
+ * url: http://localhost:3000/orders/getAllOrder
+
+ */
+
+router.get('/getAllOrder', async (req, res, next) => {
+    try {
+        
+
+        const data = await orderModel.find({})
+        if (data) {
+            return res.status(200).json({ status: true, data: data });
+        } else {
+            return res.status(400).json({ status: false });
+        }
+    } catch (error) {
+        console.error('Lỗi khi lấy người dùng:', error.message);
+        return res.status(500).json({ status: false, error: error.message });
+    }
+});
+
+
+/**
  * cập nhật trạng thái
  * method: get
  * url: http://localhost:3000/orders/updateStatusOrder
@@ -108,6 +133,51 @@ router.put('/updateStatusOrder/:_id', async (req, res, next) => {
         return res.status(500).json({ status: false, error: error.message });
     }
 });
+
+/**
+ * thống kê số lượng mua và bán
+ * method: get
+ * url: http://localhost:3000/orders/getSalesAnhPurchase
+
+ */
+router.get('/getSalesAnhPurchase', async (req, res, next) => {
+    try {
+        
+
+        const data = await getSalesAnhPurchase()
+        if (data) {
+            return res.status(200).json({ status: true, data: data });
+        } else {
+            return res.status(400).json({ status: false });
+        }
+    } catch (error) {
+        console.error('Lỗi khi lấy người dùng:', error.message);
+        return res.status(500).json({ status: false, error: error.message });
+    }
+});
+
+/**
+ * thống kê tình trạng đặt hàng
+ * method: get
+ * url: http://localhost:3000/orders/getOrderSummary
+
+ */
+router.get('/getOrderSummary', async (req, res, next) => {
+    try {
+        
+
+        const data = await getOrderSummary()
+        if (data) {
+            return res.status(200).json({ status: true, data: data });
+        } else {
+            return res.status(400).json({ status: false });
+        }
+    } catch (error) {
+        console.error('Lỗi khi lấy người dùng:', error.message);
+        return res.status(500).json({ status: false, error: error.message });
+    }
+});
+
 
 
 

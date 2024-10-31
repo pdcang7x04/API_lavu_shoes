@@ -11,8 +11,8 @@ const create = async (user, paymentmethod, totalAmount, paymentStatus, product) 
             throw new Error('Người dùng không tồn tại');
         }
 
-        
-        
+
+
 
         const newOder = new orderModel({
             user: userdata,
@@ -29,7 +29,8 @@ const create = async (user, paymentmethod, totalAmount, paymentStatus, product) 
         for (const item of product) {
             const productInStock = await productModel.findById(item.product_id);
             if (productInStock) {
-                productInStock.currentQuantity -= item.quantity; 
+                productInStock.currentQuantity -= item.quantity;
+                productInStock.quantitySold += item.quantity;
                 if (productInStock.stock < 0) {
                     throw new Error('Không đủ hàng trong kho cho sản phẩm: ' + productInStock.name);
                 }
@@ -75,6 +76,7 @@ const updateStatusOrder = async (_id, paymentStatus) => {
             throw new Error('Đơn hàng đã bị hủy');
         }
 
+
         // Cập nhật trạng thái thanh toán và thời gian cập nhật
         order.paymentStatus = paymentStatus;
         order.updatedAt = Date.now();
@@ -93,7 +95,7 @@ const updateStatusOrder = async (_id, paymentStatus) => {
 const getOrder = async (page, limit, keywords) => {
     try {
         page = parseInt(page) || 1;
-        limit = parseInt(limit) || 20; 
+        limit = parseInt(limit) || 20;
         let skip = (page - 1) * limit; // Tính số lượng sản phẩm bỏ qua
 
         // Sắp xếp theo ngày tạo
@@ -123,4 +125,86 @@ const getOrder = async (page, limit, keywords) => {
     }
 }
 
-module.exports = { create, updateStatusOrder, getOrder, getHistoryShopping };
+const getSalesAnhPurchase = async () => {
+    try {
+        const monthlyOrderData = {};
+        const orders = await orderModel.find({});
+
+        // Group order data by month
+        for (const item of orders) {
+            const month = item.createdAt.toString().slice(4, 7);
+            if (!monthlyOrderData[month]) {
+                monthlyOrderData[month] = {
+                    month: month,
+                    sales: 0,
+                    purchase: 0,
+                    revenue: 0,
+                    profit: 0
+                };
+            }
+
+            // Total quantity sold
+            const totalQuantitySold = item.orderDetail.reduce((total, currentItem) => total + currentItem.quantity, 0);
+            monthlyOrderData[month].sales += totalQuantitySold;
+
+            // Assume total purchase quantity for the month
+            monthlyOrderData[month].purchase = 100;
+
+            // Use Promise.all to fetch product details concurrently
+            const productPromises = item.orderDetail.map(async (detail) => {
+                const product = await productModel.findById(detail.product_id);
+                const revenue = detail.quantity * product.price;
+                const cost = 50000; // Assuming a fixed cost per item
+                monthlyOrderData[month].revenue += revenue;
+                monthlyOrderData[month].profit += (revenue - cost);
+            });
+
+            // Wait for all product promises to resolve
+            await Promise.all(productPromises);
+        }
+
+        return monthlyOrderData;
+    } catch (error) {
+        console.log('Insert cart error:', error);
+        throw new Error('Insert cart error');
+    }
+};
+const getOrderSummary = async () => {
+    try {
+        const monthlyOrderData = {};
+        const order = await orderModel.find({});
+        // Nhóm dữ liệu giỏ hàng theo tháng
+        order.forEach(item => {
+            const month = item.createdAt.toString().slice(4, 7);
+            if (!monthlyOrderData[month]) {
+                monthlyOrderData[month] = {
+                    month: month,
+                    ordered: 0,
+                    delivered: 0,
+                    cancled: 0
+                };
+            }
+
+            // số lượng đơn đã đặt
+            monthlyOrderData[month].ordered++
+            // // số lượng đơn đã hủy
+            if(item.paymentStatus == 5){
+                monthlyOrderData[month].delivered++
+            }
+            // số lượng đơn đã hủy
+            if(item.paymentStatus == 6){
+                monthlyOrderData[month].cancled++
+            }
+            
+        });
+
+        return monthlyOrderData;
+    } catch (error) {
+        console.log('Insert cart error:', error);
+        throw new Error('Insert cart error');
+    }
+}
+
+
+
+module.exports = { create, updateStatusOrder, getOrder, getHistoryShopping, getSalesAnhPurchase, getOrderSummary };

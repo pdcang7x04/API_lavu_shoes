@@ -22,10 +22,15 @@ const dataTest = async () => {
             const category = categories[Math.floor(Math.random() * categories.length)];
             const product = new productModel({
                 name: `Product ${index}`,
-                price: 200000 * index,
-                currentQuantity: 100 * index,
+                price: 2000 * index,
+                currentQuantity: 10 * index,
                 description: "Air Jordan là một thương hiệu giày bóng rổ của Mỹ, chuyên về quần áo thể thao, thường ngày và thời trang được sản xuất bởi Nike....",
-                image: 'https://i.pinimg.com/564x/47/35/9a/47359a80edd62bcd25abad1ccff4a025.jpg',
+                image: [
+                    'https://i.pinimg.com/564x/47/35/9a/47359a80edd62bcd25abad1ccff4a025.jpg',
+                    "https://i.pinimg.com/564x/47/35/9a/47359a80edd62bcd25abad1ccff4a025.jpg",
+                    "https://i.pinimg.com/564x/cc/20/9a/cc209aac79338b51a9dc2ce491344c4a.jpg",
+                    "https://i.pinimg.com/564x/8f/b9/66/8fb9667188613b6766d7241193127b64.jpg",
+                ],
                 color: [
                     {
                         name: "Trắng",
@@ -40,7 +45,7 @@ const dataTest = async () => {
                         image: "https://i.pinimg.com/564x/8f/b9/66/8fb9667188613b6766d7241193127b64.jpg"
                     }
                 ],
-                size: [36, 37, 38, 39, 40, 41, 42, 43, 44, 54],
+                size: [36, 37, 38, 39, 40, 41, 42, 43, 44,],
                 status: status[Math.floor(Math.random() * status.length)],
                 brand: {
                     _id: brand._id,
