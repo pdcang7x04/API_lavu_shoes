@@ -367,10 +367,16 @@ const changePassword = async (email, oldPassword, newPassword) => {
 // Shipping Address
 const updateShippingAddress = async (_id, address, phone) => {
     try {
-        const user = await userModel.findById(_id)
+        let user = await userModel.findById(_id);
+        
         if (!user) {
-            throw new Error('Người dùng không tồn tại')
+            user = await AccountGoogle.findById(_id);
         }
+
+        if (!user) {
+            throw new Error('Người dùng không tồn tại');
+        }
+
 
         user.address = address || user.address
         user.phone = phone || user.phone

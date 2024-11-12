@@ -1,15 +1,22 @@
 const userModel = require("../user/userModel")
 const productModel = require("../product/productModel");
 const favoriteModel = require("./favoriteModel");
+const AccountGoogle = require("../user/AccountGoogle");
 
 
 
 // thêm sản phẩm yêu thích
 const insert = async (email, product_id) => {
     try {
-        const user = await userModel.findOne({email: email})
+
+        let user = await userModel.findOne({email: email})
+        
         if (!user) {
-            throw new Error('Người dùng không tồn tại')
+            user = await AccountGoogle.findOne({email: email})
+        }
+
+        if (!user) {
+            throw new Error('Người dùng không tồn tại');
         }
 
         const product = await productModel.findOne({_id: product_id})

@@ -19,8 +19,8 @@ var router = express.Router();
 
 router.post('/createOder', async (req, res, next) => {
     try {
-        const { user, paymentmethod, totalAmount, paymentStatus, product } = req.body
-        const data = await create(user, paymentmethod, totalAmount, paymentStatus, product)
+        const { user, paymentmethod, totalAmount, paymentStatus, note, product } = req.body
+        const data = await create(user, paymentmethod, totalAmount, paymentStatus, note, product)
         if (data) {
             return res.status(200).json({ status: true, data: data });
         } else {

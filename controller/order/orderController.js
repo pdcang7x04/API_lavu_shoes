@@ -4,15 +4,17 @@ const userModel = require("../user/userModel")
 const AccountGoogle = require("../user/AccountGoogle")
 
 // tạo đơn hàng
-const create = async (user, paymentmethod, totalAmount, paymentStatus, product) => {
+const create = async (user, paymentmethod, totalAmount, paymentStatus, note, product) => {
     try {
-        let userdata = await userModel.findOne({ email: user }) || AccountGoogle.findOne({ email: user })
+        let userdata = await userModel.findOne({ email: user });
+        
+        if (!userdata) {
+            userdata = await AccountGoogle.findOne({ email: user });
+        }
+
         if (!userdata) {
             throw new Error('Người dùng không tồn tại');
         }
-
-
-
 
         const newOder = new orderModel({
             user: userdata,
@@ -23,6 +25,7 @@ const create = async (user, paymentmethod, totalAmount, paymentStatus, product) 
                 phone: userdata.phone
             },
             paymentStatus: paymentStatus,
+            note: note == null ? '' : note,
             orderDetail: product
         })
 
@@ -49,10 +52,16 @@ const create = async (user, paymentmethod, totalAmount, paymentStatus, product) 
 // lịch sử mua hàng
 const getHistoryShopping = async (email) => {
     try {
-        let userdata = await userModel.findOne({ email: email }) || AccountGoogle.findOne({ email: email })
+        let userdata = await userModel.findOne({ email: email });
+        
+        if (!userdata) {
+            userdata = await AccountGoogle.findOne({ email: email });
+        }
+
         if (!userdata) {
             throw new Error('Người dùng không tồn tại');
         }
+
         let sort = { createdAt: -1 };
         const data = await orderModel
             .find({ 'user.email': userdata.email })
