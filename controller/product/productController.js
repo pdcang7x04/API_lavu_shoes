@@ -126,6 +126,12 @@ const update = async (_id, name, price, currentQuantity, description, image, col
             throw new Error('Không tìm thấy sản phẩm với ID đã cho');
         }
 
+        const brandData = await brandModel.findById(brand);
+
+        if (!data) {
+            throw new Error('Không tìm thấy sản phẩm với ID đã cho');
+        }
+
         data.name = name || data.name
         data.price = price || data.price
         data.currentQuantity = currentQuantity || data.currentQuantity
@@ -134,7 +140,7 @@ const update = async (_id, name, price, currentQuantity, description, image, col
         data.color = color || data.color
         data.size = size || data.size
         data.status = status || data.status
-        data.brand = brand || data.brand
+        data.brand = {_id: brandData._id, name: brandData.name} || data.brand
         data.category = category || data.category
         data.updatedAt = Date.now()
 
