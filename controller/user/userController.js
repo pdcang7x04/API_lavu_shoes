@@ -172,6 +172,10 @@ const updateUser = async (_id, username, email, image) => {
         let user = await userModel.findById(_id);
 
         if (!user) {
+            user = await AccountGoogle.findById(_id);
+        }
+
+        if (!user) {
             throw new Error('Người dùng không tồn tại');
         }
 
@@ -180,7 +184,8 @@ const updateUser = async (_id, username, email, image) => {
         user.image = image || user.image;
         user.updatedAt = Date.now();
 
-        return await user.save()
+        const result = await user.save()
+        return result
     } catch (error) {
         console.log(error.message);
         throw error;
